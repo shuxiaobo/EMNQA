@@ -184,7 +184,7 @@ if __name__ == '__main__':
     data_file = args_dic.train_data_file
 
     logger.info('Use CUDA : %s' % USE_CUDA)
-    if os.path.isfile('earlystoping-EMNQA.models'):
+    if os.path.isfile('earlystoping-EMNQAs.models'):
         logger.info("Find the model state dict . init model...")
         train_from_model(data_file)
     else:
