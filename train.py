@@ -65,6 +65,7 @@ def train_from_scratch(filename):  # training
     train_data = util.bAbI_data_load(filename)
     test_data = util.bAbI_data_load(args_dic.test_data_file)
     word2idx, idx2word = util.build_words_dict(train_data)
+    test_data = util.bAbI_data_test(test_data, word2idx)
     seq2variable(train_data, word2idx)
     print('Model init.')
     model = DMN(HIDDEN_SIZE, len(word2idx), len(word2idx), word2idx)
@@ -133,9 +134,6 @@ def pad_fact(fact, x_to_ix):  # this is for inference
 
 
 def evaluation(word2id, model, test_data):
-    # data = util.bAbI_data_load(args_dic.test_data_file)
-    # seq2variable(data, word2id)
-    # test_data = util.bAbI_data_test(test_data, word2ix=word2id)
     accuracy = 0
     for d in test_data:
         facts, facts_mask = pad_fact(d[0], word2id)
@@ -152,18 +150,13 @@ def evaluation(word2id, model, test_data):
     print(accuracy / len(test_data) * 100)
 
 
-def train_from_model(filename):
-    train_data = util.bAbI_data_load(filename)
-    word2idx, idx2word = util.build_words_dict(train_data)
-    seq2variable(train_data, word2idx)
+def train_from_model():
     print('Model init.')
-    model = DMN(HIDDEN_SIZE, len(word2idx), len(word2idx), word2idx)
     m = torch.load('earlystoping-EMNQA.model', map_location=lambda storage, loc: storage)
-    model.load_state_dict(state_dict=m)
-    torch.save({
-        'state_dict': model.state_dict(),
-        'word2idx': model.word2index,
-    }, 'earlystoping-EMNQA.models')
+    word2idx = m['word2idx']
+    model = DMN(HIDDEN_SIZE, len(word2idx), len(word2idx), word2idx)
+    model.load_state_dict(state_dict=m['state_dict'])
+
     logger.info('Load from state dict over. Evaluation now')
     test_data = util.bAbI_data_load(args_dic.test_data_file)
     test_data = util.bAbI_data_test(test_data, word2idx)
@@ -184,7 +177,7 @@ if __name__ == '__main__':
     data_file = args_dic.train_data_file
 
     logger.info('Use CUDA : %s' % USE_CUDA)
-    if os.path.isfile('earlystoping-EMNQAs.models'):
+    if os.path.isfile('earlystoping-EMNQA.model'):
         logger.info("Find the model state dict . init model...")
         train_from_model(data_file)
     else:

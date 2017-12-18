@@ -60,7 +60,7 @@ def process(word2index):
     model.zero_grad()
     pred = model([fact], [fact_mask], question, question_mask, answer.size(0), args.episode)
 
-    print("Facts : ")
+    print("\n\n\nFacts : ")
     print('\n'.join([' '.join(list(map(lambda x: index2word[x], f))) for f in fact.data.tolist()]))
     print("")
     print("Question : ", ' '.join(list(map(lambda x: index2word[x], question.data.tolist()[0]))))
@@ -75,7 +75,7 @@ if __name__ == '__main__':
 
     args = args.parse_args()
 
-    m = torch.load('earlystoping-EMNQA.models', map_location=lambda storage, loc: storage)
+    m = torch.load('earlystoping-EMNQA.model', map_location=lambda storage, loc: storage)
     model = DMN(HIDDEN_SIZE, len(m['word2idx']), len(m['word2idx']), m['word2idx'])
     model.load_state_dict(state_dict=m['state_dict'])
     word2id = model.word2index
