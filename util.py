@@ -130,7 +130,7 @@ def build_words_dict(data):
     print('Build the words dict now...')
     fact, q, a = list(zip(*data))  # *data把data散列， zip把data按照列组装起来，然后list
 
-    vacab = list(set(flatten(flatten(fact) + flatten(q) + flatten(a))))
+    vacab = set(flatten(flatten(fact) + list(q) + flatten(a)))
     word2id = {'<PAD>': 0, '<UNK>': 1, '<s>': 2, '</s>': 3}
     for w in vacab:
         if w not in word2id:

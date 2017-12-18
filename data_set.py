@@ -1,6 +1,6 @@
 from torch.utils.data import Dataset
 
-from DMNQA import util
+from EMNQA import util
 
 
 class QAdataset(Dataset):

@@ -6,9 +6,9 @@ sys.path.append('..')
 import torch
 from torch.autograd import Variable
 
-from DMNQA import util
-from DMNQA.model import DMN
-from DMNQA.util import prepare_sequence
+from EMNQA import util
+from EMNQA.model import DMN
+from EMNQA.util import prepare_sequence
 
 USE_CUDA = torch.cuda.is_available()
 

@@ -10,9 +10,9 @@ from torch.optim import Adam
 from torch.utils.data import DataLoader
 
 sys.path.append('..')
-from DMNQA import util
-from DMNQA.data_set import QAdataset
-from DMNQA.model import DMN
+from EMNQA import util
+from EMNQA.data_set import QAdataset
+from EMNQA.model import DMN
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -64,7 +64,7 @@ def seq2variable(data, word2id):  # data -> variable
 def train_from_scratch(filename):  # training
     train_data = util.bAbI_data_load(filename)
     test_data = util.bAbI_data_load(args_dic.test_data_file)
-    word2idx, idx2word = util.build_words_dict(train_data + test_data)
+    word2idx, idx2word = util.build_words_dict(train_data)
     seq2variable(train_data, word2idx)
     print('Model init.')
     model = DMN(HIDDEN_SIZE, len(word2idx), len(word2idx), word2idx)
@@ -135,7 +135,7 @@ def pad_fact(fact, x_to_ix):  # this is for inference
 def evaluation(word2id, model, test_data):
     # data = util.bAbI_data_load(args_dic.test_data_file)
     # seq2variable(data, word2id)
-    test_data = util.bAbI_data_test(test_data, word2ix=word2id)
+    # test_data = util.bAbI_data_test(test_data, word2ix=word2id)
     accuracy = 0
     for d in test_data:
         facts, facts_mask = pad_fact(d[0], word2id)
@@ -164,7 +164,10 @@ def train_from_model(filename):
         'state_dict': model.state_dict(),
         'word2idx': model.word2index,
     }, 'earlystoping-EMNQA.models')
-    evaluation(word2idx, model, test_data=train_data)
+    logger.info('Load from state dict over. Evaluation now')
+    test_data = util.bAbI_data_load(args_dic.test_data_file)
+    test_data = util.bAbI_data_test(test_data, word2idx)
+    evaluation(word2idx, model, test_data=test_data)
 
 
 if __name__ == '__main__':
@@ -181,7 +184,9 @@ if __name__ == '__main__':
     data_file = args_dic.train_data_file
 
     logger.info('Use CUDA : %s' % USE_CUDA)
-    if os.path.isfile('earlystoping-EMNQA.model'):
+    if os.path.isfile('earlystoping-EMNQA.models'):
+        logger.info("Find the model state dict . init model...")
         train_from_model(data_file)
     else:
+        logger.info('No model state dict be Found .init model from scratch!')
         train_from_scratch(data_file)
